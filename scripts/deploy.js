@@ -36,3 +36,6 @@ main()
         console.error(error);
         process.exit(1);
     });
+
+
+//Whitelist Contract Address: 0xED532D54111DE16926a4c57F68163Ee12152EEE3
