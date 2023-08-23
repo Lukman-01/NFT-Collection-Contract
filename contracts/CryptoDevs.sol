@@ -5,6 +5,10 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./Whitelist.sol";
 
+/**
+ * @title CryptoDevs
+ * @dev This contract implements the CryptoDevs NFT collection, allowing users to mint NFTs and handle reservations for whitelisted addresses.
+ */
 contract CryptoDevs is ERC721Enumerable, Ownable {
     //  _price is the price of one Crypto Dev NFT
     uint256 constant public _price = 0.01 ether;
@@ -20,21 +24,23 @@ contract CryptoDevs is ERC721Enumerable, Ownable {
     uint256 public reservedTokensClaimed = 0;
 
     /**
-      * @dev ERC721 constructor takes in a `name` and a `symbol` to the token collection.
-      * name in our case is `Crypto Devs` and symbol is `CD`.
-      * Constructor for Crypto Devs takes in the baseURI to set _baseTokenURI for the collection.
-      * It also initializes an instance of whitelist interface.
-      */
+     * @dev Constructor to initialize the CryptoDevs contract.
+     * @param whitelistContract The address of the Whitelist contract.
+     */
     constructor (address whitelistContract) ERC721("Crypto Devs", "CD") {
         whitelist = Whitelist(whitelistContract);
         reservedTokens = whitelist.maxWhitelistedAddresses();
     }
 
+    /**
+     * @dev Mint a new Crypto Dev NFT.
+     * Users can mint if they are part of the whitelist with remaining reserved tokens, or by sending enough ETH.
+     */
     function mint() public payable {
         // Make sure we always leave enough room for whitelist reservations
         require(totalSupply() + reservedTokens - reservedTokensClaimed < maxTokenIds, "EXCEEDED_MAX_SUPPLY");
 
-        // If user is part of the whitelist, make sure there is still reserved tokens left
+        // If user is part of the whitelist, make sure there are still reserved tokens left
         if (whitelist.whitelistedAddresses(msg.sender) && msg.value < _price) {
             // Make sure user doesn't already own an NFT
             require(balanceOf(msg.sender) == 0, "ALREADY_OWNED");
@@ -48,10 +54,9 @@ contract CryptoDevs is ERC721Enumerable, Ownable {
     }
 
     /**
-    * @dev withdraw sends all the ether in the contract
-    * to the owner of the contract
-      */
-    function withdraw() public onlyOwner  {
+     * @dev Withdraw all the ether in the contract to the owner of the contract.
+     */
+    function withdraw() public onlyOwner {
         address _owner = owner();
         uint256 amount = address(this).balance;
         (bool sent, ) =  _owner.call{value: amount}("");
