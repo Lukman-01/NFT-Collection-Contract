@@ -1,20 +1,69 @@
-# CryptoDevs NFT Collection
+# Crypto Devs NFT Project
 
-The CryptoDevs NFT Collection is a smart contract-based project built on the Ethereum blockchain that allows users to mint unique NFTs (Non-Fungible Tokens) representing Crypto Devs. These NFTs are distinct and scarce digital assets, each with its own individuality. The project aims to create an engaging and rewarding experience for users while promoting transparency and inclusivity.
+This project lets you deploy a whitelist contract and an NFT contract where whitelisted users can mint NFTs for free while others need to pay.
 
-## Contracts
+## Features
 
-This repository contains two Solidity smart contracts:
+- Whitelist system with a maximum number of allowed addresses.
+- An NFT (ERC-721) contract with the following functionalities:
+  - Limited total supply (20 NFTs).
+  - 1 NFT per transaction rule.
+  - Whitelisted users can mint for free.
+  - Non-whitelisted users must pay 0.01 ETH to mint.
 
-1. **CryptoDevs.sol**: This contract implements the ERC721Enumerable standard, enabling the creation and management of the CryptoDevs NFTs. It also integrates access control through the Ownable contract. Users can mint Crypto Dev NFTs by sending the required amount of Ether. There are reserved tokens for whitelisted addresses, ensuring early access for selected participants. The contract safeguards against exceeding the maximum supply and ensures fair distribution.
+## Environment Setup
 
-2. **Whitelist.sol**: The Whitelist contract manages a list of whitelisted Ethereum addresses. It allows addresses to be added to the whitelist, restricting certain actions or providing privileges based on membership. This contract is utilized in the CryptoDevs contract to reserve tokens for whitelisted users.
+1. Clone this repository.
+2. Navigate to the `hardhat` directory.
+3. Set up environment variables by creating a `.env` file with the following entries:
 
-## Getting Started
+```bash
+PRIVATE_KEY="your_metamask_private_key"
+RPC_URL="your_quicknode_http_provider_link"
+ETHERSCAN_API_KEY="your_etherscan_api_key"
+```
 
-To interact with the CryptoDevs NFT Collection and the Whitelist contract, follow these steps:
+## Deployment
 
-1. Deploy the Whitelist contract with a specified maximum number of whitelisted addresses.
-2. Deploy the CryptoDevs contract, providing the address of the deployed Whitelist contract.
-3. Users can add their addresses to the whitelist through the Whitelist contract.
-4. Users can then mint Crypto Dev NFTs using the CryptoDevs contract, following the specified rules for pricing and whitelisting.
+1. Install the required npm packages:
+
+```bash
+npm install
+npm install @openzeppelin/contracts
+npm install dotenv
+```
+
+2. Deploy the Whitelist contract:
+
+```bash
+npx hardhat run scripts/deploy.js --network sepolia
+```
+
+3. Take note of the contract address of the deployed Whitelist.
+
+4. Replace the placeholder address in `deploy-nft.js` with your Whitelist contract address.
+
+5. Deploy the NFT contract:
+
+```bash
+npx hardhat run scripts/deploy-nft.js --network sepolia
+```
+
+6. Interact with the contracts via Etherscan (Sepolia Testnet) or programmatically through web3 or ethers.js libraries.
+
+## Testing
+
+### For Whitelisted Addresses
+
+1. Use Sepolia Etherscan to connect your wallet and interact with the Whitelist contract's "addAddressToWhitelist" function.
+2. Now, interact with the NFT contract's `mint` function without sending any ETH.
+
+### For Non-Whitelisted Addresses
+
+1. Use Sepolia Etherscan to connect your wallet and interact with the NFT contract's `mint` function.
+2. You'll need to send exactly 0.01 ETH for the minting to succeed.
+
+## Important Notes
+
+- Always ensure you're using a testnet account for deployment to avoid any loss of real funds.
+- Keep your private key and other environment variables confidential. Avoid publishing or sharing your `.env` file.
